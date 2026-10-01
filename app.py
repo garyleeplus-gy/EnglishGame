@@ -276,7 +276,6 @@ PHASE_5_MONS = [(495,"藤藤蛇"), (496,"青藤蛇"), (497,"君主蛇"), (498,"�
 
 PHASE_6_BOSS = [(647,"凱路迪歐"), (648,"美洛耶塔"), (649,"蓋諾賽克特")]
 PHASE_6_MONS = [(570,"索羅亞"), (571,"索羅亞克"), (595,"電電蟲"), (596,"電蜘蛛"), (610,"牙牙"), (611,"斧牙龍"), (612,"雙斧戰龍"), (624,"駒刀小兵"), (625,"劈斬司令")]
-
 # 🚀 動態圖鑑整合系統
 def get_active_pokedex(admin_cfg):
     active_monsters = [{"name": n, "url": get_local_image_base64(f"assets/pokemon/{i}.gif")} for i, n in BASE_MONSTER_DATA]
