@@ -37,6 +37,21 @@ setup_environment()
 import streamlit as st
 import firebase_admin
 from firebase_admin import credentials, db
+import base64  # 新增 base64 模組用於讀取本地圖片
+
+# ==========================================
+# 🚀 本地素材轉 Base64 函數 (快取優化)
+# ==========================================
+@st.cache_data
+def get_local_image_base64(filepath):
+    try:
+        with open(filepath, "rb") as f:
+            data = base64.b64encode(f.read()).decode("utf-8")
+        ext = filepath.split('.')[-1].lower()
+        mime = "image/gif" if ext == "gif" else "image/png"
+        return f"data:{mime};base64,{data}"
+    except FileNotFoundError:
+        return "" # 找不到圖時防呆
 
 # ==========================================
 # 🚀 雲端資料庫 Firebase 連線初始化
@@ -82,7 +97,8 @@ BOSS_DATA = [
     (494,"比克提尼"), (635,"三首惡龍"), (638,"勾帕路翁"), (639,"代拉基翁"), (640,"畢力吉翁"),
     (641,"龍捲雲"), (642,"雷電雲"), (643,"萊希拉姆"), (644,"捷克羅姆"), (645,"土地雲"), (646,"酋雷姆")
 ]
-BOSSES = [{"name": n, "url": f"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/{i}.gif"} for i, n in BOSS_DATA]
+# 改為讀取本地端 Base64
+BOSSES = [{"name": n, "url": get_local_image_base64(f"assets/pokemon/{i}.gif")} for i, n in BOSS_DATA]
 
 MONSTER_DATA = [
     (10,"綠毛蟲"),(11,"鐵甲蛹"),(12,"巴大蝶"), (13,"獨角蟲"),(14,"鐵殼蛹"),(15,"大針蜂"),
@@ -129,7 +145,8 @@ MONSTER_DATA = [
     (235,"圖圖犬"), (236,"巴爾郎"),(237,"戰舞郎"), (241,"大奶罐"),
     (246,"幼基拉斯"),(247,"沙基拉斯")
 ]
-MONSTERS = [{"name": n, "url": f"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/{i}.gif"} for i, n in MONSTER_DATA]
+# 改為讀取本地端 Base64
+MONSTERS = [{"name": n, "url": get_local_image_base64(f"assets/pokemon/{i}.gif")} for i, n in MONSTER_DATA]
 
 # ==========================================
 # ☁️ 核心 API (Firebase Realtime DB) 與預設數值
@@ -152,14 +169,14 @@ DEFAULT_GACHA = {
 }
 DEFAULT_STORE = {"potion": 200, "shield": 250, "magnifier": 100}
 
-# 🌟 HD 高清 3D 寶可夢精靈球
+# 🌟 HD 高清 3D 寶可夢精靈球 (改讀本地端)
 BALL_IMAGES = {
-    "特獎": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/beast-ball.png", 
-    "一獎": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/luxury-ball.png", 
-    "二獎": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/master-ball.png", 
-    "三獎": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/ultra-ball.png",  
-    "四獎": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/great-ball.png",  
-    "五獎": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png"    
+    "特獎": get_local_image_base64("assets/items/beast-ball.png"), 
+    "一獎": get_local_image_base64("assets/items/luxury-ball.png"), 
+    "二獎": get_local_image_base64("assets/items/master-ball.png"), 
+    "三獎": get_local_image_base64("assets/items/ultra-ball.png"),  
+    "四獎": get_local_image_base64("assets/items/great-ball.png"),  
+    "五獎": get_local_image_base64("assets/items/poke-ball.png")    
 }
 
 @st.cache_data(ttl=300) 
@@ -603,13 +620,14 @@ elif st.session_state.page == 'game':
         prize = st.session_state.gacha_result_prize
         b_color = "#bdc3c7"
         
+        # 改為讀取本地 HD 精靈球素材
         HD_BALL_IMAGES = {
-            "特獎": "https://www.serebii.net/itemdex/sprites/pgl/beastball.png",
-            "一獎": "https://www.serebii.net/itemdex/sprites/pgl/luxuryball.png",
-            "二獎": "https://www.serebii.net/itemdex/sprites/pgl/masterball.png",
-            "三獎": "https://www.serebii.net/itemdex/sprites/pgl/ultraball.png",
-            "四獎": "https://www.serebii.net/itemdex/sprites/pgl/greatball.png",
-            "五獎": "https://www.serebii.net/itemdex/sprites/pgl/pokeball.png"
+            "特獎": get_local_image_base64("assets/items/hd_beast-ball.png"),
+            "一獎": get_local_image_base64("assets/items/hd_luxury-ball.png"),
+            "二獎": get_local_image_base64("assets/items/hd_master-ball.png"),
+            "三獎": get_local_image_base64("assets/items/hd_ultra-ball.png"),
+            "四獎": get_local_image_base64("assets/items/hd_great-ball.png"),
+            "五獎": get_local_image_base64("assets/items/hd_poke-ball.png")
         }
         
         b_img = HD_BALL_IMAGES["五獎"]
@@ -778,7 +796,9 @@ elif st.session_state.page == 'game':
     
     stage_idx = 0 if u_data['level'] < 5 else (1 if u_data['level'] < 10 else 2)
     hero_img_id, hero_img_name = char_d["stages"][stage_idx]
-    hero_url = f"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/{hero_img_id}.gif"
+    
+    # 載入本地主角 Base64 GIF
+    hero_url = get_local_image_base64(f"assets/pokemon/{hero_img_id}.gif")
 
     bank_id = u_data.get('vocab_bank', '國小')
     bank_name = bank_id
@@ -809,7 +829,6 @@ elif st.session_state.page == 'game':
         if "spell_input" in st.session_state: st.session_state.spell_input = "" 
         
         # 🚨 [終極防護] 在處理任何資料前，強制先拉取最新的資料庫狀態！
-        # 這樣才能確保小孩答題存檔時，不會把家長剛剛在後台「退回」的資料給蓋掉。
         latest_db = load_user_data(u_key)
         u_data['gold'] = latest_db.get('gold', u_data.get('gold', 0))
         u_data['medals'] = latest_db.get('medals', u_data.get('medals', 0))
@@ -1901,7 +1920,8 @@ elif st.session_state.page == 'parent':
             h_cols = st.columns(min(len(h_v["stages"]), 5))
             for idx, (h_id, h_name) in enumerate(h_v["stages"]):
                 lvl_req = 1 if idx==0 else (5 if idx==1 else 10)
-                h_cols[idx].image(f"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/{h_id}.gif", caption=f"Lv.{lvl_req} {h_name}")
+                # 改為讀取本地端 Base64
+                h_cols[idx].image(get_local_image_base64(f"assets/pokemon/{h_id}.gif"), caption=f"Lv.{lvl_req} {h_name}")
         
         st.markdown("---")
         st.subheader(f"🏆 傳說 BOSS 挑戰圖鑑 (共 {len(BOSSES)} 隻)")
