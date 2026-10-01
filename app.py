@@ -37,7 +37,7 @@ setup_environment()
 import streamlit as st
 import firebase_admin
 from firebase_admin import credentials, db
-import base64  # 新增 base64 模組用於讀取本地圖片
+import base64
 
 # ==========================================
 # 🚀 本地素材轉 Base64 函數 (快取優化)
@@ -86,7 +86,10 @@ HURT_SOUNDS = [
     {"type": "triangle", "f1": 100, "f2": 20, "len": 0.4}
 ]
 
-BOSS_DATA = [
+# ==========================================
+# 🌟 基礎與 6 階段動態圖鑑資料庫
+# ==========================================
+BASE_BOSS_DATA = [
     (144,"急凍鳥"), (145,"閃電鳥"), (146,"火焰鳥"), (149,"快龍"), (150,"超夢"), (151,"夢幻"),
     (243,"雷公"), (244,"炎帝"), (245,"水君"), (248,"班基拉斯"), (249,"洛奇亞"), (250,"鳳王"), (251,"時拉比"),
     (373,"暴飛龍"), (376,"巨金怪"), (377,"雷吉洛克"), (378,"雷吉艾斯"), (379,"雷吉斯奇魯"),
@@ -97,56 +100,82 @@ BOSS_DATA = [
     (494,"比克提尼"), (635,"三首惡龍"), (638,"勾帕路翁"), (639,"代拉基翁"), (640,"畢力吉翁"),
     (641,"龍捲雲"), (642,"雷電雲"), (643,"萊希拉姆"), (644,"捷克羅姆"), (645,"土地雲"), (646,"酋雷姆")
 ]
-# 改為讀取本地端 Base64
-BOSSES = [{"name": n, "url": get_local_image_base64(f"assets/pokemon/{i}.gif")} for i, n in BOSS_DATA]
 
-MONSTER_DATA = [
+BASE_MONSTER_DATA = [
     (10,"綠毛蟲"),(11,"鐵甲蛹"),(12,"巴大蝶"), (13,"獨角蟲"),(14,"鐵殼蛹"),(15,"大針蜂"),
     (16,"波波"),(17,"比比鳥"),(18,"大比鳥"), (19,"小拉達"),(20,"拉達"), (21,"烈雀"),(22,"大嘴雀"),
-    (23,"阿柏蛇"),(24,"阿柏怪"), (27,"穿山鼠"),(28,"穿山王"),
-    (29,"尼多蘭"),(30,"尼多娜"),(31,"尼多后"), (32,"尼多朗"),(33,"尼多力諾"),(34,"尼多王"),
-    (35,"皮皮"),(36,"皮可西"), (37,"六尾"),(38,"九尾"), (39,"胖丁"),(40,"胖可丁"),
-    (41,"超音蝠"),(42,"大嘴蝠"),(169,"叉字蝠"),
-    (43,"走路草"),(44,"臭臭花"),(45,"霸王花"),(182,"美麗花"),
-    (46,"派拉斯"),(47,"派拉斯特"), (48,"毛球"),(49,"摩魯蛾"),
-    (50,"地鼠"),(51,"三地鼠"), (52,"喵喵"),(53,"貓老大"),
+    (23,"阿柏蛇"),(24,"阿柏怪"), (27,"穿山鼠"),(28,"穿山王"), (29,"尼多蘭"),(30,"尼多娜"),(31,"尼多后"), 
+    (32,"尼多朗"),(33,"尼多力諾"),(34,"尼多王"), (35,"皮皮"),(36,"皮可西"), (37,"六尾"),(38,"九尾"), 
+    (39,"胖丁"),(40,"胖可丁"), (41,"超音蝠"),(42,"大嘴蝠"),(169,"叉字蝠"), (43,"走路草"),(44,"臭臭花"),(45,"霸王花"),(182,"美麗花"),
+    (46,"派拉斯"),(47,"派拉斯特"), (48,"毛球"),(49,"摩魯蛾"), (50,"地鼠"),(51,"三地鼠"), (52,"喵喵"),(53,"貓老大"),
     (54,"可達鴨"),(55,"哥達鴨"), (56,"猴怪"),(57,"火爆猴"), (58,"卡蒂狗"),(59,"風速狗"),
-    (60,"蚊香蝌蚪"),(61,"蚊香君"),(62,"蚊香泳士"),(186,"蚊香蛙皇"),
-    (63,"凱西"),(64,"勇基拉"),(65,"胡地"), (66,"腕力"),(67,"豪力"),(68,"怪力"),
-    (69,"喇叭芽"),(70,"口呆花"),(71,"大食花"), (72,"瑪瑙水母"),(73,"毒刺水母"),
-    (74,"小拳石"),(75,"隆隆石"),(76,"隆隆岩"), (77,"小火馬"),(78,"烈焰馬"),
-    (79,"呆呆獸"),(80,"呆殼獸"),(199,"呆呆王"), (81,"小磁怪"),(82,"三合一磁怪"),
-    (83,"大蔥鴨"), (84,"嘟嘟"),(85,"嘟嘟利"), (86,"小海獅"),(87,"白海獅"),
-    (88,"臭泥"),(89,"臭臭泥"), (90,"大舌貝"),(91,"刺甲貝"),
-    (92,"鬼斯"),(93,"鬼斯通"),(94,"耿鬼"), (95,"大岩蛇"),(208,"大鋼蛇"),
-    (96,"催眠貘"),(97,"引夢貘人"), (98,"大鉗蟹"),(99,"巨鉗蟹"),
-    (100,"霹靂電球"),(101,"頑皮雷彈"), (102,"蛋蛋"),(103,"椰蛋樹"),
-    (104,"卡拉卡拉"),(105,"嘎啦嘎啦"), (108,"大舌頭"),
-    (109,"瓦斯彈"),(110,"雙彈瓦斯"), (111,"獨角犀牛"),(112,"鑽角犀獸"), (114,"蔓藤怪"),
-    (116,"墨海馬"),(117,"海刺龍"),(230,"刺龍王"), (118,"角金魚"),(119,"金魚王"),
-    (120,"海星星"),(121,"寶石海星"), (127,"凱羅斯"), (128,"肯泰羅"),
-    (129,"鯉魚王"),(130,"暴鯉龍"), (131,"拉普拉斯"), (132,"百變怪"),
-    (133,"伊布"),(134,"水伊布"),(135,"雷伊布"),(136,"火伊布"),(196,"太陽伊布"),(197,"月亮伊布"),
-    (137,"多邊獸"),(233,"多邊獸Ⅱ"), (143,"卡比獸"),
-    (147,"迷你龍"),(148,"哈克龍"),
-    (161,"尾立"),(162,"大尾立"), (163,"咕咕"),(164,"貓頭夜鷹"),
-    (165,"芭瓢蟲"),(166,"安瓢蟲"), (167,"圓絲蛛"),(168,"阿利多斯"),
-    (170,"燈籠魚"),(171,"電燈怪"), (175,"波克比"),(176,"波克基古"),
-    (177,"天然雀"),(178,"天然鳥"), (179,"咩利羊"),(180,"茸茸羊"),(181,"電龍"),
-    (183,"瑪力露"),(184,"瑪力露麗"), (185,"胡說樹"),
-    (187,"毽子草"),(188,"毽子花"),(189,"毽子棉"), (190,"長尾怪手"),
-    (191,"向日種子"),(192,"向日花怪"), (193,"陽々瑪"),
-    (194,"烏波"),(195,"沼王"), (198,"黑暗鴉"), (200,"夢妖"), (202,"果然翁"),
-    (204,"榛果球"),(205,"佛烈托斯"), (206,"土龍弟弟"), (209,"布魯"),(210,"布魯皇"),
-    (213,"壺壺"), (214,"赫拉克羅斯"), (216,"熊寶寶"),(217,"圈圈熊"),
-    (218,"熔岩蟲"),(219,"熔岩蝸牛"), (220,"小山豬"),(221,"長毛豬"),
-    (222,"太陽珊瑚"), (223,"鐵炮魚"),(224,"章魚桶"), (225,"信使鳥"),
-    (228,"戴魯比"),(229,"黑魯加"), (231,"小小象"),(232,"頓甲"),
-    (235,"圖圖犬"), (236,"巴爾郎"),(237,"戰舞郎"), (241,"大奶罐"),
-    (246,"幼基拉斯"),(247,"沙基拉斯")
+    (60,"蚊香蝌蚪"),(61,"蚊香君"),(62,"蚊香泳士"),(186,"蚊香蛙皇"), (63,"凱西"),(64,"勇基拉"),(65,"胡地"), 
+    (66,"腕力"),(67,"豪力"),(68,"怪力"), (69,"喇叭芽"),(70,"口呆花"),(71,"大食花"), (72,"瑪瑙水母"),(73,"毒刺水母"),
+    (74,"小拳石"),(75,"隆隆石"),(76,"隆隆岩"), (77,"小火馬"),(78,"烈焰馬"), (79,"呆呆獸"),(80,"呆殼獸"),(199,"呆呆王"), 
+    (81,"小磁怪"),(82,"三合一磁怪"), (83,"大蔥鴨"), (84,"嘟嘟"),(85,"嘟嘟利"), (86,"小海獅"),(87,"白海獅"),
+    (88,"臭泥"),(89,"臭臭泥"), (90,"大舌貝"),(91,"刺甲貝"), (92,"鬼斯"),(93,"鬼斯通"),(94,"耿鬼"), (95,"大岩蛇"),(208,"大鋼蛇"),
+    (96,"催眠貘"),(97,"引夢貘人"), (98,"大鉗蟹"),(99,"巨鉗蟹"), (100,"霹靂電球"),(101,"頑皮雷彈"), (102,"蛋蛋"),(103,"椰蛋樹"),
+    (104,"卡拉卡拉"),(105,"嘎啦嘎啦"), (108,"大舌頭"), (109,"瓦斯彈"),(110,"雙彈瓦斯"), (111,"獨角犀牛"),(112,"鑽角犀獸"), 
+    (114,"蔓藤怪"), (116,"墨海馬"),(117,"海刺龍"),(230,"刺龍王"), (118,"角金魚"),(119,"金魚王"),
+    (120,"海星星"),(121,"寶石海星"), (127,"凱羅斯"), (128,"肯泰羅"), (129,"鯉魚王"),(130,"暴鯉龍"), (131,"拉普拉斯"), 
+    (132,"百變怪"), (133,"伊布"),(134,"水伊布"),(135,"雷伊布"),(136,"火伊布"),(196,"太陽伊布"),(197,"月亮伊布"),
+    (137,"多邊獸"),(233,"多邊獸Ⅱ"), (143,"卡比獸"), (147,"迷你龍"),(148,"哈克龍"),
+    (161,"尾立"),(162,"大尾立"), (163,"咕咕"),(164,"貓頭夜鷹"), (165,"芭瓢蟲"),(166,"安瓢蟲"), (167,"圓絲蛛"),(168,"阿利多斯"),
+    (170,"燈籠魚"),(171,"電燈怪"), (175,"波克比"),(176,"波克基古"), (177,"天然雀"),(178,"天然鳥"), 
+    (179,"咩利羊"),(180,"茸茸羊"),(181,"電龍"), (183,"瑪力露"),(184,"瑪力露麗"), (185,"胡說樹"),
+    (187,"毽子草"),(188,"毽子花"),(189,"毽子棉"), (190,"長尾怪手"), (191,"向日種子"),(192,"向日花怪"), (193,"陽々瑪"),
+    (194,"烏波"),(195,"沼王"), (198,"黑暗鴉"), (200,"夢妖"), (202,"果然翁"), (204,"榛果球"),(205,"佛烈托斯"), 
+    (206,"土龍弟弟"), (209,"布魯"),(210,"布魯皇"), (213,"壺壺"), (214,"赫拉克羅斯"), (216,"熊寶寶"),(217,"圈圈熊"),
+    (218,"熔岩蟲"),(219,"熔岩蝸牛"), (220,"小山豬"),(221,"長毛豬"), (222,"太陽珊瑚"), (223,"鐵炮魚"),(224,"章魚桶"), 
+    (225,"信使鳥"), (228,"戴魯比"),(229,"黑魯加"), (231,"小小象"),(232,"頓甲"), (235,"圖圖犬"), 
+    (236,"巴爾郎"),(237,"戰舞郎"), (241,"大奶罐"), (246,"幼基拉斯"),(247,"沙基拉斯")
 ]
-# 改為讀取本地端 Base64
-MONSTERS = [{"name": n, "url": get_local_image_base64(f"assets/pokemon/{i}.gif")} for i, n in MONSTER_DATA]
+
+# === 圖鑑分階段擴充陣列 ===
+PHASE_1_BOSS = []
+PHASE_1_MONS = [(252,"木守宮"), (253,"森林蜥蜴"), (254,"蜥蜴王"), (255,"火稚雞"), (256,"力壯雞"), (257,"火焰雞"), (258,"水躍魚"), (259,"沼躍魚"), (260,"巨沼怪"), (270,"蓮葉童子"), (271,"蓮帽小童"), (272,"樂天河童"), (280,"拉魯拉絲"), (281,"奇魯莉安"), (282,"沙奈朵"), (287,"懶人獺"), (288,"過動猿"), (289,"請假王")]
+
+PHASE_2_BOSS = []
+PHASE_2_MONS = [(304,"可可多拉"), (305,"可多拉"), (306,"波士可多拉"), (328,"大顎蟻"), (329,"超音波幼蟲"), (330,"沙漠蜻蜓"), (355,"夜巡靈"), (356,"彷徨夜靈"), (371,"寶貝龍"), (372,"甲殼龍")]
+
+PHASE_3_BOSS = []
+PHASE_3_MONS = [(387,"草苗龜"), (388,"樹林龜"), (389,"土台龜"), (390,"小火焰猴"), (391,"猛火猴"), (392,"烈焰猴"), (393,"波加曼"), (394,"波皇子"), (395,"帝王拿波"), (403,"小貓怪"), (404,"勒克貓"), (405,"倫琴貓")]
+
+PHASE_4_BOSS = [(489,"霏歐納"), (490,"瑪納霏"), (492,"潔咪")]
+PHASE_4_MONS = [(443,"圓陸鯊"), (444,"尖牙陸鯊"), (446,"小卡比獸"), (447,"利歐路"), (448,"路卡利歐"), (453,"不良蛙"), (454,"毒骷蛙")]
+
+PHASE_5_BOSS = []
+PHASE_5_MONS = [(495,"藤藤蛇"), (496,"青藤蛇"), (497,"君主蛇"), (498,"暖暖豬"), (499,"炒炒豬"), (500,"炎武王"), (501,"水水獺"), (502,"雙刃丸"), (503,"大劍鬼"), (511,"花椰猴"), (513,"爆香猴"), (515,"冷水猴")]
+
+PHASE_6_BOSS = [(647,"凱路迪歐"), (648,"美洛耶塔"), (649,"蓋諾賽克特")]
+PHASE_6_MONS = [(570,"索羅亞"), (571,"索羅亞克"), (595,"電電蟲"), (596,"電蜘蛛"), (610,"牙牙"), (611,"斧牙龍"), (612,"雙斧戰龍"), (624,"駒刀小兵"), (625,"劈斬司令")]
+
+# 🚀 動態圖鑑整合系統
+def get_active_pokedex(admin_cfg):
+    active_monsters = [{"name": n, "url": get_local_image_base64(f"assets/pokemon/{i}.gif")} for i, n in BASE_MONSTER_DATA]
+    active_bosses = [{"name": n, "url": get_local_image_base64(f"assets/pokemon/{i}.gif")} for i, n in BASE_BOSS_DATA]
+    
+    phases = admin_cfg.get("unlocked_phases", {})
+    if phases.get("phase_1", False):
+        active_monsters.extend([{"name": n, "url": get_local_image_base64(f"assets/pokemon/{i}.gif")} for i, n in PHASE_1_MONS])
+        active_bosses.extend([{"name": n, "url": get_local_image_base64(f"assets/pokemon/{i}.gif")} for i, n in PHASE_1_BOSS])
+    if phases.get("phase_2", False):
+        active_monsters.extend([{"name": n, "url": get_local_image_base64(f"assets/pokemon/{i}.gif")} for i, n in PHASE_2_MONS])
+        active_bosses.extend([{"name": n, "url": get_local_image_base64(f"assets/pokemon/{i}.gif")} for i, n in PHASE_2_BOSS])
+    if phases.get("phase_3", False):
+        active_monsters.extend([{"name": n, "url": get_local_image_base64(f"assets/pokemon/{i}.gif")} for i, n in PHASE_3_MONS])
+        active_bosses.extend([{"name": n, "url": get_local_image_base64(f"assets/pokemon/{i}.gif")} for i, n in PHASE_3_BOSS])
+    if phases.get("phase_4", False):
+        active_monsters.extend([{"name": n, "url": get_local_image_base64(f"assets/pokemon/{i}.gif")} for i, n in PHASE_4_MONS])
+        active_bosses.extend([{"name": n, "url": get_local_image_base64(f"assets/pokemon/{i}.gif")} for i, n in PHASE_4_BOSS])
+    if phases.get("phase_5", False):
+        active_monsters.extend([{"name": n, "url": get_local_image_base64(f"assets/pokemon/{i}.gif")} for i, n in PHASE_5_MONS])
+        active_bosses.extend([{"name": n, "url": get_local_image_base64(f"assets/pokemon/{i}.gif")} for i, n in PHASE_5_BOSS])
+    if phases.get("phase_6", False):
+        active_monsters.extend([{"name": n, "url": get_local_image_base64(f"assets/pokemon/{i}.gif")} for i, n in PHASE_6_MONS])
+        active_bosses.extend([{"name": n, "url": get_local_image_base64(f"assets/pokemon/{i}.gif")} for i, n in PHASE_6_BOSS])
+        
+    return active_monsters, active_bosses
 
 # ==========================================
 # ☁️ 核心 API (Firebase Realtime DB) 與預設數值
@@ -191,14 +220,17 @@ def get_admin():
         "default_play_time_min": cfg.get("default_play_time_min", 30),
         "game_rates": cfg.get("game_rates", DEFAULT_RATES),
         "store_prices": cfg.get("store_prices", DEFAULT_STORE),
-        "gacha": cfg.get("gacha", DEFAULT_GACHA)
+        "gacha": cfg.get("gacha", DEFAULT_GACHA),
+        "unlocked_phases": cfg.get("unlocked_phases", {
+            "phase_1": False, "phase_2": False, "phase_3": False,
+            "phase_4": False, "phase_5": False, "phase_6": False
+        })
     }
 
 def save_admin(d): 
     db.reference("system/admin").set(d)
     get_admin.clear()
 
-# 🎯 最佳化：只抓取單一家長，不再做全表掃描
 @st.cache_data(ttl=300)
 def get_parent_info(parent_id):
     return db.reference(f"parents/{parent_id}").get() or {}
@@ -207,7 +239,6 @@ def save_parent_info(parent_id, d):
     db.reference(f"parents/{parent_id}").set(d)
     get_parent_info.clear()
 
-# 🎯 最佳化：利用 Firebase index 搜尋該家庭下的英雄
 def get_family_heroes(parent_id):
     heroes = db.reference("users").order_by_child("parent").equal_to(parent_id).get()
     return heroes if heroes else {}
@@ -231,7 +262,6 @@ def save_vocab_db(bank_key, df):
     db.reference(f"vocab_banks/{bank_key}").set(records)
     load_vocab_db.clear()
 
-# 🎯 解決方案 2：利用 st.cache_resource 避免每次點擊都耗用 Firebase 流量去檢查
 @st.cache_resource
 def init_default_vocabs():
     if not db.reference("vocab_banks/國小/0").get(): save_vocab_db("國小", pd.DataFrame({"en": ["apple", "cat", "dog"], "zh": ["蘋果", "貓", "狗"], "hint": ["水果", "動物", "動物"]}))
@@ -552,6 +582,9 @@ elif st.session_state.page == 'game':
     
     p_info = get_parent_info(parent_id)
     admin_cfg = get_admin()
+
+    # 🚀 動態生成全域圖鑑 (套用六階段擴充)
+    MONSTERS, BOSSES = get_active_pokedex(admin_cfg)
 
     now_ts = time.time()
     if 'last_db_sync' not in st.session_state:
@@ -1415,6 +1448,9 @@ elif st.session_state.page == 'parent':
     p_data = get_parent_info(p_id)
     admin_cfg = get_admin()
     
+    # 🚀 動態生成全域圖鑑 (套用六階段擴充)
+    MONSTERS, BOSSES = get_active_pokedex(admin_cfg)
+    
     if "custom_banks" not in p_data:
         p_data["custom_banks"] = [{"id": "1", "name": "預設自建字庫"}]
         save_parent_info(p_id, p_data)
@@ -1965,7 +2001,8 @@ elif st.session_state.page == 'admin':
     if st.button("⬅️ 登出並返回大廳"): st.session_state.page = 'login'; st.rerun()
     st.markdown("---")
     
-    t1, t5, t2, t3, t4 = st.tabs(["👨‍👩‍👧 租戶管理", "⚙️ 全域數值設定", "📋 回饋審核", "📚 題庫增訂", "⚙ 系統設定"])
+    # 🌟 GM 新增 t6 圖鑑擴充頁籤
+    t1, t5, t6, t2, t3, t4 = st.tabs(["👨‍👩‍👧 租戶管理", "⚙️ 全域數值設定", "🗺️ 圖鑑擴充", "📋 回饋審核", "📚 題庫增訂", "⚙ 系統設定"])
     admin_cfg = get_admin()
     
     with t1:
@@ -2110,6 +2147,30 @@ elif st.session_state.page == 'admin':
                         })
                     admin_cfg["gacha"] = {"cost": g_cost, "prizes": final_prizes}
                     save_admin(admin_cfg); st.success("扭蛋機設定已儲存！"); st.rerun()
+
+    # 🌟 GM 新增的圖鑑管理區塊
+    with t6:
+        st.subheader("🗺️ 圖鑑擴充管理 (6階段開放系統)")
+        st.info("開啟對應階段後，該階段的寶可夢與傳說 Boss 將會出現在遊戲的隨機遭遇與全域圖鑑中！(關閉時不會刪除孩子的收集紀錄，僅會暫時隱藏)")
+        
+        unlocked = admin_cfg.get("unlocked_phases", {})
+        
+        c1, c2 = st.columns(2)
+        p1 = c1.toggle("🟢 解鎖第一階段 (豐緣地區前半)", value=unlocked.get("phase_1", False))
+        p2 = c2.toggle("🟢 解鎖第二階段 (豐緣地區後半)", value=unlocked.get("phase_2", False))
+        p3 = c1.toggle("🟡 解鎖第三階段 (神奧地區前半)", value=unlocked.get("phase_3", False))
+        p4 = c2.toggle("🟡 解鎖第四階段 (神奧地區後半)", value=unlocked.get("phase_4", False))
+        p5 = c1.toggle("🔴 解鎖第五階段 (合眾地區前半)", value=unlocked.get("phase_5", False))
+        p6 = c2.toggle("🔴 解鎖第六階段 (合眾地區後半)", value=unlocked.get("phase_6", False))
+
+        if st.button("💾 儲存圖鑑開放設定", type="primary"):
+            admin_cfg["unlocked_phases"] = {
+                "phase_1": p1, "phase_2": p2, "phase_3": p3,
+                "phase_4": p4, "phase_5": p5, "phase_6": p6
+            }
+            save_admin(admin_cfg)
+            st.success("✅ 圖鑑擴充設定已儲存並全域生效！")
+            st.rerun()
 
     with t2:
         st.subheader("📋 官方字庫回饋審核")
