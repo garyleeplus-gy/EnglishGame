@@ -580,13 +580,14 @@ elif st.session_state.page == 'game':
         prize = st.session_state.gacha_result_prize
         b_color = "#bdc3c7"
         
+        GITHUB_BASE_URL = "https://raw.githubusercontent.com/garyleeplus-gy/EnglishGame/main/assets/items/"
         HD_BALL_IMAGES = {
-            "特獎": "https://www.serebii.net/itemdex/sprites/pgl/beastball.png",
-            "一獎": "https://www.serebii.net/itemdex/sprites/pgl/luxuryball.png",
-            "二獎": "https://www.serebii.net/itemdex/sprites/pgl/masterball.png",
-            "三獎": "https://www.serebii.net/itemdex/sprites/pgl/ultraball.png",
-            "四獎": "https://www.serebii.net/itemdex/sprites/pgl/greatball.png",
-            "五獎": "https://www.serebii.net/itemdex/sprites/pgl/pokeball.png"
+            "特獎": f"{GITHUB_BASE_URL}hd_beast-ball.png",
+            "一獎": f"{GITHUB_BASE_URL}hd_luxury-ball.png",
+            "二獎": f"{GITHUB_BASE_URL}hd_master-ball.png",
+            "三獎": f"{GITHUB_BASE_URL}hd_ultra-ball.png",
+            "四獎": f"{GITHUB_BASE_URL}hd_great-ball.png",
+            "五獎": f"{GITHUB_BASE_URL}hd_poke-ball.png"
         }
         
         b_img = HD_BALL_IMAGES["五獎"]
