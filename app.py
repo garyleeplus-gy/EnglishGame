@@ -735,7 +735,9 @@ elif st.session_state.page == 'game':
     if bank_id.startswith("custom_"):
         cb_id = bank_id.split("_")[1]
         v_list = load_vocab_db(f"custom_{parent_id}_{cb_id}")
-        if not v_list: v_list = [{"en": "apple", "zh": "蘋果", "hint": "預設單字"}]
+        if not v_list: 
+            v_list = [{"en": "apple", "zh": "蘋果", "hint": "預設單字"}]
+            st.warning("⚠️ 這個字庫目前是空的，請通知家長去控制台新增單字！")
         bank_name = next((b["name"] for b in p_info.get("custom_banks", []) if b["id"] == cb_id), "自訂字庫")
     else:
         v_list = load_vocab_db(bank_id)
