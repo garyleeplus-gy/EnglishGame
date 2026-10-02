@@ -114,7 +114,7 @@ BALL_IMAGES = {
     "五獎": f"{GITHUB_BASE_URL}poke-ball.png"
 }
 
-@st.cache_data(ttl=300) 
+@st.cache_data(ttl=30) 
 def get_admin(): 
     cfg = db.reference("system/admin").get() or {}
     return {
@@ -134,7 +134,7 @@ def save_admin(d):
     db.reference("system/admin").set(d)
     get_admin.clear()
 
-@st.cache_data(ttl=300)
+@st.cache_data(ttl=30)
 def get_parent_info(parent_id):
     return db.reference(f"parents/{parent_id}").get() or {}
 
