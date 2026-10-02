@@ -112,10 +112,6 @@ BALL_IMAGES = {
 }
 
 @st.cache_data(ttl=300) 
-def get_admin():
-        }    
-
-@st.cache_data(ttl=300) 
 def get_admin(): 
     cfg = db.reference("system/admin").get() or {}
     return {
