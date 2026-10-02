@@ -1373,7 +1373,7 @@ elif st.session_state.page == 'parent':
                 n_diff = st.selectbox("選擇初始難度", ["簡單", "中等", "困難"], index=0)
                 if st.button("確認建立"):
                     # 加入正則表達式，過濾掉 Firebase 嚴禁的符號 . # $ [ ] /
-                    safe_name = re.sub(r'[.#$\[\]/\]', '', n_name.strip())
+                    safe_name = re.sub(r'[.#$\/[\]/]', '', n_name.strip())
                     
                     if not safe_name or not n_pin.strip(): 
                         st.error("名稱與密碼不可為空，且名稱不能僅包含特殊符號！")
