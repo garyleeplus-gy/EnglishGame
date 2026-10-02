@@ -13,19 +13,24 @@ import requests
 # ==========================================
 # 🚀 雲端資料庫 Firebase 連線初始化
 # ==========================================
-if not firebase_admin._apps:
-    try:
-        cert_dict = dict(st.secrets["firebase"])
-        db_url = cert_dict.pop("databaseURL")
-        cert_dict["private_key"] = cert_dict["private_key"].replace('\\n', '\n')
-        
-        cred = credentials.Certificate(cert_dict)
-        firebase_admin.initialize_app(cred, {
-            'databaseURL': db_url
-        })
-    except Exception as e:
-        st.error(f"🚨 Firebase 初始化失敗！請檢查 Streamlit Secrets 設定是否正確。錯誤訊息：{e}")
-        st.stop()
+@st.cache_resource
+def init_firebase():
+    if not firebase_admin._apps:
+        try:
+            cert_dict = dict(st.secrets["firebase"])
+            db_url = cert_dict.pop("databaseURL")
+            cert_dict["private_key"] = cert_dict["private_key"].replace('\\n', '\n')
+            
+            cred = credentials.Certificate(cert_dict)
+            firebase_admin.initialize_app(cred, {
+                'databaseURL': db_url
+            })
+        except Exception as e:
+            st.error(f"🚨 Firebase 初始化失敗！請檢查 Streamlit Secrets 設定是否正確。錯誤訊息：{e}")
+            st.stop()
+    return True
+
+init_firebase()
 
 # ==========================================
 # 🧬 寶可夢全圖鑑動態生成 (1~649) 與階段設定
