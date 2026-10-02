@@ -821,6 +821,116 @@ elif st.session_state.page == 'game':
         else:
             st.error("金幣與庫存皆不足！")
 
+# --- 🎰 幸運扭蛋機 ---
+    with st.expander("🎰 幸運扭蛋機 (花費金幣抽大獎)", expanded=False):
+        g_col1, g_col2 = st.columns([1, 1])
+        with g_col1:
+            gacha_html = f"""
+            <html><head><style>
+                body {{ margin: 0; padding: 0; font-family: sans-serif; background: transparent; overflow: hidden; display: flex; justify-content: center; align-items: center; }}
+                .gacha-wrapper {{ display: flex; justify-content: center; align-items: center; padding: 25px 0 10px 0; width: 100%; }}
+                .gacha-machine {{ background-color: #ff4757; border: 4px solid #2f3542; border-radius: 20px; padding: 20px 15px 10px; width: 280px; text-align: center; box-shadow: inset -5px -5px 0px rgba(0,0,0,0.1), 0 8px 0 #ff6b81, 0 15px 20px rgba(0,0,0,0.3); position: relative; margin: 0 auto; }}
+                .gacha-glass {{ background-color: #f1f2f6; border: 4px solid #2f3542; border-radius: 15px; height: 160px; margin-bottom: 15px; position: relative; overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.1); }}
+                .gacha-ball {{ position: absolute; width: 45px; height: 45px; background-size: contain; background-repeat: no-repeat; border-radius: 50%; box-shadow: 2px 2px 5px rgba(0,0,0,0.3); image-rendering: pixelated; }}
+            </style></head><body>
+            <div class="gacha-wrapper">
+                <div class="gacha-machine">
+                    <div style="background: #feca57; width: 100px; height: 30px; border: 4px solid #2f3542; border-radius: 20px 20px 0 0; position: absolute; top: -34px; left: 50%; transform: translateX(-50%);">
+                        <div style="background: #ff6b6b; width: 14px; height: 14px; border-radius: 50%; margin: 4px auto; border: 2px solid #2f3542;"></div>
+                    </div>
+                    <div class="gacha-glass">
+                        <div class="gacha-ball" style="background-image: url('{BALL_IMAGES["一獎"]}'); top: 10px; left:10px; transform: rotate(20deg);"></div>
+                        <div class="gacha-ball" style="background-image: url('{BALL_IMAGES["三獎"]}'); top: 40px; left:50px; transform: rotate(-15deg);"></div>
+                        <div class="gacha-ball" style="background-image: url('{BALL_IMAGES["四獎"]}'); top: 15px; left:110px; transform: rotate(45deg);"></div>
+                        <div class="gacha-ball" style="background-image: url('{BALL_IMAGES["五獎"]}'); top: 70px; left:10px; transform: rotate(-30deg);"></div>
+                        <div class="gacha-ball" style="background-image: url('{BALL_IMAGES["二獎"]}'); top: 90px; left:80px; transform: rotate(10deg);"></div>
+                        <div class="gacha-ball" style="background-image: url('{BALL_IMAGES["特獎"]}'); top: 60px; left:140px; transform: rotate(60deg);"></div>
+                        <div class="gacha-ball" style="background-image: url('{BALL_IMAGES["三獎"]}'); bottom: 5px; left:30px; transform: rotate(80deg);"></div>
+                        <div class="gacha-ball" style="background-image: url('{BALL_IMAGES["五獎"]}'); bottom: 10px; left:110px; transform: rotate(-40deg);"></div>
+                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 50%); pointer-events: none;"></div>
+                    </div>
+                    <div style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 5px;">
+                        <div style="font-weight: bold; color: white; text-shadow: 1px 1px 0px #000; font-size: 1.1rem; text-align: left; line-height: 1.2;">點擊旋轉<br>({gacha_cfg['cost']}G) 👉</div>
+                        <div id="gacha-knob" style="width: 70px; height: 70px; background: #1dd1a1; border: 4px solid #2f3542; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.5s; box-shadow: 0 4px 0 #10ac84, inset 0 2px 5px rgba(255,255,255,0.5);">
+                            <div style="width: 50px; height: 12px; background: #feca57; border: 2px solid #2f3542; transform: rotate(45deg); border-radius: 5px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                document.getElementById('gacha-knob').onclick = function() {{
+                    this.style.transform = 'rotate(360deg)';
+                    let ctx = window.parent.gameAudioCtx;
+                    if(ctx) {{
+                        if(ctx.state === 'suspended') ctx.resume();
+                        let osc = ctx.createOscillator(); let gain = ctx.createGain();
+                        osc.type = 'sine'; osc.connect(gain); gain.connect(ctx.destination);
+                        let now = ctx.currentTime;
+                        for(let i=0; i<10; i++){{osc.frequency.setValueAtTime(300 + Math.random()*200, now + i*0.05);}}
+                        gain.gain.setValueAtTime(0.2, now); gain.gain.linearRampToValueAtTime(0, now + 0.5);
+                        osc.start(now); osc.stop(now + 0.5);
+                    }}
+                    setTimeout(() => {{
+                        const btns = window.parent.document.querySelectorAll('button');
+                        for (let b of btns) {{ if(b.innerText.includes('🎮隱藏抽獎發動🎮')) {{ b.click(); break; }} }}
+                        setTimeout(() => {{ document.getElementById('gacha-knob').style.transform = 'rotate(0deg)'; }}, 500);
+                    }}, 600);
+                }};
+            </script>
+            </body></html>
+            """
+            st.components.v1.html(gacha_html, height=360)
+            
+            if st.button("🎮隱藏抽獎發動🎮"):
+                if u_data['gold'] >= gacha_cfg['cost']:
+                    u_data['gold'] -= gacha_cfg['cost']
+                    save_user_data(u_key, u_data)
+                    prizes = gacha_cfg['prizes']
+                    weights = [p['prob'] for p in prizes]
+                    prize = random.choices(prizes, weights=weights)[0]
+                    st.session_state.show_gacha_result = True
+                    st.session_state.gacha_result_prize = prize
+                    st.rerun()
+                else: st.error("金幣不足！快去打怪賺錢吧！")
+
+        with g_col2:
+            st.markdown("<div style='font-size:1.1rem; font-weight:bold; color:#ff4757; margin-bottom:10px;'>📜 最新扭蛋紀錄</div>", unsafe_allow_html=True)
+            if u_data.get('gacha_history'):
+                for item in reversed(u_data['gacha_history']): st.caption(f"• {item}")
+            else: st.caption("尚未有扭蛋紀錄。")
+
+    # --- 🎁 家庭獎勵兌換系統 ---
+    with st.expander("🎁 家庭獎勵兌換與紀錄 (花費勳章)", expanded=False):
+        r_cols = st.columns(2)
+        with r_cols[0]:
+            st.markdown("**🏪 可兌換獎勵**")
+            if not r_list: st.info("家長尚未設定獎勵")
+            u_reward_counts = u_data.get("reward_counts", {})
+            for r in r_list:
+                r_name = r['reward']
+                r_limit = r.get('limit', admin_cfg.get('default_reward_limit', 99))
+                r_count = u_reward_counts.get(r_name, 0)
+                r_left = r_limit - r_count
+                
+                btn_disabled = (u_data['medals'] < int(r['cost_medals'])) or (r_left <= 0)
+                btn_lbl = f"{r['icon']} {r_name} (需 {r['cost_medals']} 勳章) - 剩餘 {r_left} 次" if r_left > 0 else f"❌ {r_name} (已達兌換上限)"
+                
+                if st.button(btn_lbl, use_container_width=True, key=f"ex_{r_name}", disabled=btn_disabled):
+                    if u_data['medals'] >= int(r['cost_medals']) and r_left > 0:
+                        u_data['medals'] -= int(r['cost_medals'])
+                        u_reward_counts[r_name] = r_count + 1
+                        u_data['reward_counts'] = u_reward_counts
+                        u_data['history'].append(f"{datetime.now().strftime('%m-%d %H:%M')} 兌換 {r_name}")
+                        save_user_data(u_key, u_data)
+                        st.success(f"🎉 成功兌換 {r_name}！")
+                        st.rerun()
+        with r_cols[1]:
+            st.markdown("**📜 我的兌換紀錄**")
+            medal_history = [item for item in u_data.get('history', []) if "扭蛋獲得" not in item]
+            if medal_history:
+                for item in reversed(medal_history[-10:]): st.caption(f"• {item}")
+            else: st.caption("尚未兌換任何獎勵。")
+    
     # --- 冒險圖鑑 (修改為依賴 ID) ---
     with st.expander(f"📖 寶可夢圖鑑 (題庫: {bank_name} | 收集: {len(u_data.get('monster_dex', []))}/{STAGE_MAX_IDS[unlocked_stage]} | 傳說: {len(u_data.get('trophies', []))}/{len([i for i in LEGENDARY_IDS if i<=STAGE_MAX_IDS[unlocked_stage]])})"):
         d_tab1, d_tab2 = st.tabs(["🏆 傳說神獸", "👾 已收集寶可夢"])
