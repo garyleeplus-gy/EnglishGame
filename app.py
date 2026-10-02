@@ -114,7 +114,6 @@ BALL_IMAGES = {
 @st.cache_data(ttl=300) 
 def get_admin():
         }    
-}
 
 @st.cache_data(ttl=300) 
 def get_admin(): 
