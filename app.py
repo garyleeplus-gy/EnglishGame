@@ -578,12 +578,12 @@ elif st.session_state.page == 'game':
         b_color = "#bdc3c7"
         
         HD_BALL_IMAGES = {
-            "特獎": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/beast-ball.png", 
-            "一獎": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/luxury-ball.png", 
-            "二獎": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/master-ball.png", 
-            "三獎": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/ultra-ball.png",  
-            "四獎": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/great-ball.png",  
-            "五獎": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png"    
+            "特獎": "https://www.serebii.net/itemdex/sprites/pgl/beastball.png",
+            "一獎": "https://www.serebii.net/itemdex/sprites/pgl/luxuryball.png",
+            "二獎": "https://www.serebii.net/itemdex/sprites/pgl/masterball.png",
+            "三獎": "https://www.serebii.net/itemdex/sprites/pgl/ultraball.png",
+            "四獎": "https://www.serebii.net/itemdex/sprites/pgl/greatball.png",
+            "五獎": "https://www.serebii.net/itemdex/sprites/pgl/pokeball.png"
         }
         
         b_img = HD_BALL_IMAGES["五獎"]
