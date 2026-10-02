@@ -101,13 +101,18 @@ DEFAULT_GACHA = {
 }
 DEFAULT_STORE = {"potion": 200, "shield": 250, "magnifier": 100, "scroll": 500}
 
-HD_BALL_IMAGES = {
-            "特獎": "https://www.serebii.net/itemdex/sprites/pgl/beastball.png",
-            "一獎": "https://www.serebii.net/itemdex/sprites/pgl/luxuryball.png",
-            "二獎": "https://www.serebii.net/itemdex/sprites/pgl/masterball.png",
-            "三獎": "https://www.serebii.net/itemdex/sprites/pgl/ultraball.png",
-            "四獎": "https://www.serebii.net/itemdex/sprites/pgl/greatball.png",
-            "五獎": "https://www.serebii.net/itemdex/sprites/pgl/pokeball.png"
+# 🌟 確保這裡只有一個左括號和一個右括號配對，不要有多餘的 '}'
+BALL_IMAGES = {
+    "特獎": "https://www.serebii.net/itemdex/sprites/pgl/beastball.png",
+    "一獎": "https://www.serebii.net/itemdex/sprites/pgl/luxuryball.png",
+    "二獎": "https://www.serebii.net/itemdex/sprites/pgl/masterball.png",
+    "三獎": "https://www.serebii.net/itemdex/sprites/pgl/ultraball.png",
+    "四獎": "https://www.serebii.net/itemdex/sprites/pgl/greatball.png",
+    "五獎": "https://www.serebii.net/itemdex/sprites/pgl/pokeball.png"
+}
+
+@st.cache_data(ttl=300) 
+def get_admin():
         }    
 }
 
