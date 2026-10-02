@@ -772,7 +772,6 @@ elif st.session_state.page == 'game':
             if word in st.session_state.error_log and stats["level"] >= 4:
                 st.session_state.error_log.remove(word)
                 save_error_log(u_key, st.session_state.error_log)
-                if not st.session_state.error_log: u_data['total_questions'] = 0
                     
             if u_data.get('is_boss_fight', False):
                 u_data['boss_hp'] -= 1
