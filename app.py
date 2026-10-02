@@ -610,9 +610,12 @@ elif st.session_state.page == 'game':
     diff = u_data.get('difficulty', "簡單")
     rates = raw_rates.get(diff, raw_rates["簡單"])
     
-    store_prices = p_info.get("store_prices", admin_cfg.get("store_prices", DEFAULT_STORE))
+    # 🌟 修正：確保新舊價格能正確疊加 (預設 < GM < 家長)
+    store_prices = DEFAULT_STORE.copy()
+    if isinstance(admin_cfg.get("store_prices"), dict): store_prices.update(admin_cfg["store_prices"])
+    if isinstance(p_info.get("store_prices"), dict): store_prices.update(p_info["store_prices"])
+    
     gacha_cfg = p_info.get("gacha", admin_cfg.get("gacha", DEFAULT_GACHA))
-
     if 'show_streak' in st.session_state:
         st.toast(st.session_state.show_streak, icon="🔥")
         del st.session_state.show_streak
@@ -1366,8 +1369,13 @@ elif st.session_state.page == 'parent':
                     if st.button(f"🗑 永久刪除此帳號", key=f"dl_{u_key}"): delete_user(u_key); st.rerun()
 
     with t2:
+        with t2:
         st.subheader("🛒 道具販售價格設定")
-        prices = p_data.get("store_prices", admin_cfg.get("store_prices", DEFAULT_STORE))
+        # 🌟 修正：確保家長後台能正確繼承 GM 的預設值並補齊新道具
+        prices = DEFAULT_STORE.copy()
+        if isinstance(admin_cfg.get("store_prices"), dict): prices.update(admin_cfg["store_prices"])
+        if isinstance(p_data.get("store_prices"), dict): prices.update(p_data["store_prices"])
+        
         c1, c2, c3, c4 = st.columns(4)
         new_p = c1.number_input("🧪 藥水價格 (G)", min_value=1, value=prices.get("potion", 200))
         new_s = c2.number_input("🛡️ 護盾價格 (G)", min_value=1, value=prices.get("shield", 250))
@@ -1685,8 +1693,12 @@ elif st.session_state.page == 'admin':
                     st.rerun()
 
     with t5:
+        with t5:
         st.subheader("⚙️ 系統全域遊戲參數預設值")
-        store = admin_cfg.get("store_prices", DEFAULT_STORE)
+        # 🌟 修正：確保 GM 後台遇到舊資料時，也能自動補齊新增的卷軸欄位
+        store = DEFAULT_STORE.copy()
+        if isinstance(admin_cfg.get("store_prices"), dict): store.update(admin_cfg["store_prices"])
+        
         gacha = admin_cfg.get("gacha", DEFAULT_GACHA)
 
         with st.expander("📖 圖鑑世代解鎖階段設定", expanded=True):
