@@ -1692,7 +1692,6 @@ elif st.session_state.page == 'admin':
                     st.rerun()
 
     with t5:
-        with t5:
         st.subheader("⚙️ 系統全域遊戲參數預設值")
         # 🌟 修正：確保 GM 後台遇到舊資料時，也能自動補齊新增的卷軸欄位
         store = DEFAULT_STORE.copy()
