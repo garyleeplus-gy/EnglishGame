@@ -1901,13 +1901,32 @@ elif st.session_state.page == 'admin':
         gacha = admin_cfg.get("gacha", DEFAULT_GACHA)
 
         with st.expander("📖 圖鑑世代解鎖階段設定", expanded=True):
-            st.info("透過此拉桿控制全球玩家可以遭遇的寶可夢數量。階段越高，遇見的寶可夢世代與數量越多。")
-            new_stage = st.slider("開放圖鑑階段 (1~6 階段)", min_value=1, max_value=6, value=admin_cfg.get("unlocked_stage", 1))
-            st.caption("1 (No.1~151), 2 (No.152~251), 3 (No.252~386), 4 (No.387~493), 5 (No.494~570), 6 (No.571~649)")
+            st.info("透過下方開關控制全球玩家可以遭遇的寶可夢數量。階段越高，開放的世代與數量越多。")
+            
+            # 詳細說明 6 個階段的狀態
+            stage_options = {
+                1: "階段 1：初代經典 (No.1 ~ No.151) - 僅開放關都地區",
+                2: "階段 2：金銀復古 (No.1 ~ No.251) - 新增城都地區",
+                3: "階段 3：寶石冒險 (No.1 ~ No.386) - 新增豐緣地區",
+                4: "階段 4：珍珠鑽石 (No.1 ~ No.493) - 新增神奧地區",
+                5: "階段 5：黑白前期 (No.1 ~ No.570) - 新增合眾地區",
+                6: "階段 6：全圖鑑解鎖 (No.1 ~ No.649) - 649 隻全數開放"
+            }
+            
+            current_stage = admin_cfg.get("unlocked_stage", 1)
+            
+            # 使用互斥開關 (Radio) 來取代拉桿
+            new_stage = st.radio(
+                "請選擇要開放的圖鑑階段：",
+                options=list(stage_options.keys()),
+                format_func=lambda x: stage_options[x],
+                index=current_stage - 1
+            )
+            
             if st.button("💾 儲存圖鑑階段"):
                 admin_cfg["unlocked_stage"] = new_stage
                 save_admin(admin_cfg)
-                st.success("✅ 設定已更新！現在玩家可以遇見更高等級的寶可夢了！")
+                st.success(f"✅ 設定已更新！目前伺服器狀態為：{stage_options[new_stage]}")
                 st.rerun()
         
         with st.expander("⏳ 系統遊玩時間預設值", expanded=True):
