@@ -806,7 +806,7 @@ elif st.session_state.page == 'game':
 
     scroll_cost = store_prices.get('scroll', 500)
     inv_scroll = u_data['inventory'].get('scroll', 0)
-    btn4_lbl = f"📜 變形卷軸 ({inv_scroll})\n點擊發動" if inv_scroll > 0 else f"📜 買卷軸\n{scroll_cost}G"
+    btn4_lbl = f"📜 變形卷軸 ({inv_scroll})\n點擊發動" if inv_scroll > 0 else f"📜 變形卷軸\n{scroll_cost}G"
     if c_btn4.button(btn4_lbl, use_container_width=True):
         if inv_scroll > 0 or u_data['gold'] >= scroll_cost:
             if inv_scroll == 0: 
