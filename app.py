@@ -1119,8 +1119,7 @@ elif st.session_state.page == 'game':
     )
     
     st.markdown(arena_html, unsafe_allow_html=True)
-    
-        st.components.v1.html(audio_js if audio_js else " ", height=0)
+    st.components.v1.html(audio_js if audio_js else " ", height=0)
 
    # ==================== ⚡ 答題區與動畫隱藏邏輯 ====================
     if anim:
