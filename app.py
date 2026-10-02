@@ -1121,8 +1121,7 @@ elif st.session_state.page == 'game':
     st.markdown(arena_html, unsafe_allow_html=True)
     
     # 加入 key="game_audio_player" 強制 Streamlit 重複利用同一個 iframe 容器
-    if audio_js: 
-        st.components.v1.html(audio_js, height=0, key="game_audio_player")
+        st.components.v1.html(audio_js if audio_js else " ", height=0)
 
    # ==================== ⚡ 答題區與動畫隱藏邏輯 ====================
     if anim:
