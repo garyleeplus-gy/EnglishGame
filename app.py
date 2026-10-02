@@ -1372,16 +1372,25 @@ elif st.session_state.page == 'parent':
                 n_bank = st.selectbox("選擇預設學習題庫", all_banks, format_func=format_bank)
                 n_diff = st.selectbox("選擇初始難度", ["簡單", "中等", "困難"], index=0)
                 if st.button("確認建立"):
-                    if not n_name.strip() or not n_pin.strip(): st.error("名稱與密碼不可為空")
+                    # 加入正則表達式，過濾掉 Firebase 嚴禁的符號 . # $ [ ] /
+                    safe_name = re.sub(r'[.#$\[\]/]', '', n_name.strip())
+                    
+                    if not safe_name or not n_pin.strip(): 
+                        st.error("名稱與密碼不可為空，且名稱不能僅包含特殊符號！")
                     else:
-                        u_key = f"{p_id}_{n_name}"
-                        if db.reference(f"users/{u_key}").get(): st.error("這個名稱已經存在於您的家庭中了！")
+                        # 使用過濾後的安全字串來建立資料庫 Key
+                        u_key = f"{p_id}_{safe_name}"
+                        
+                        if db.reference(f"users/{u_key}").get(): 
+                            st.error("這個名稱已經存在於您的家庭中了！")
                         else:
                             c = random.choice(list(CHARACTERS.keys())) if n_char == "隨機" else n_char
-                            new_hero = {"name": n_name.strip(), "parent": p_id, "character": c, "created_at": str(datetime.now().date()), "pin": n_pin.strip()}
+                            # 顯示的名稱也改用 safe_name，避免後續讀取時發生非預期的錯誤
+                            new_hero = {"name": safe_name, "parent": p_id, "character": c, "created_at": str(datetime.now().date()), "pin": n_pin.strip()}
                             save_user_meta(u_key, new_hero)
                             
                             init_data = load_user_data(u_key)
+                            # ... (後續原始碼保持不變)
                             init_data["vocab_bank"] = n_bank
                             init_data["difficulty"] = n_diff
                             save_user_data(u_key, init_data)
