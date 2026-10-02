@@ -1369,7 +1369,6 @@ elif st.session_state.page == 'parent':
                     if st.button(f"🗑 永久刪除此帳號", key=f"dl_{u_key}"): delete_user(u_key); st.rerun()
 
     with t2:
-        with t2:
         st.subheader("🛒 道具販售價格設定")
         # 🌟 修正：確保家長後台能正確繼承 GM 的預設值並補齊新道具
         prices = DEFAULT_STORE.copy()
