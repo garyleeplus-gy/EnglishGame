@@ -1240,6 +1240,9 @@ elif st.session_state.page == 'game':
 
         else:
             if u_data['total_questions'] >= 20 and st.session_state.error_log: st.warning("🔥 累積滿 20 題！進入強制錯題複習模式！")
+
+            if bank_id.startswith("custom_") and len(v_list) == 1 and v_list[0]["en"] == "apple":
+            st.warning("⚠️ 家長注意：這個自訂字庫目前是空的！請盡快前往「家庭控制台」新增單字！")
                 
             v_html = f'<div class="vocab-card"><h3 style="margin:0; color:#7f8c8d; font-size: 1.2rem;">✨ 詠唱單字 ✨ {rev}</h3>'
             if diff == '簡單':
