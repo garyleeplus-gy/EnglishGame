@@ -1251,15 +1251,22 @@ elif st.session_state.page == 'game':
             elif diff == '中等' or diff == '困難':
                 word_en = c_w['en']
                 w_len = len(word_en)
+                
+                # 先計算原本難度該給的基礎提示
+                base_indices = []
+                if diff == '中等':
+                    if w_len <= 3: base_indices = [w_len // 2]
+                    else: N = (w_len - 1) // 3 + 1; base_indices = [int(i * (w_len - 1) / (N - 1) + 0.5) for i in range(N)]
+                
+                # 如果有買放大鏡，則「額外」多開 2 個字母
                 if st.session_state.magnifier_active:
-                    reveal_count = min(1, w_len)
-                    r = random.Random(word_en)
-                    indices = sorted(r.sample(range(w_len), reveal_count))
-                else:
-                    if diff == '中等':
-                        if w_len <= 3: indices = [w_len // 2]
-                        else: N = (w_len - 1) // 3 + 1; indices = [int(i * (w_len - 1) / (N - 1) + 0.5) for i in range(N)]
-                    else: indices = []
+                    available = [i for i in range(w_len) if i not in base_indices and word_en[i] not in [' ', '-']]
+                    extra_reveal = min(2, len(available))
+                    if extra_reveal > 0:
+                        # 隨機挑選未解鎖的字母解鎖
+                        base_indices.extend(random.sample(available, extra_reveal))
+                        
+                indices = sorted(base_indices)
                         
                 hint_chars = [char if (i in indices or char in [' ', '-']) else '_' for i, char in enumerate(word_en)]
                 hint_str = " ".join(hint_chars)
