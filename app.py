@@ -102,14 +102,17 @@ DEFAULT_GACHA = {
 DEFAULT_STORE = {"potion": 200, "shield": 250, "magnifier": 100, "scroll": 500}
 
 # 🌟 確保這裡只有一個左括號和一個右括號配對，不要有多餘的 '}'
+# 設定 GitHub Raw 的基礎路徑
+GITHUB_BASE_URL = "https://raw.githubusercontent.com/garyleeplus-gy/EnglishGame/main/assets/items/"
+
 BALL_IMAGES = {
-    "特獎": "https://www.serebii.net/itemdex/sprites/pgl/beastball.png",
-            "一獎": "https://www.serebii.net/itemdex/sprites/pgl/luxuryball.png",
-            "二獎": "https://www.serebii.net/itemdex/sprites/pgl/masterball.png",
-            "三獎": "https://www.serebii.net/itemdex/sprites/pgl/ultraball.png",
-            "四獎": "https://www.serebii.net/itemdex/sprites/pgl/greatball.png",
-            "五獎": "https://www.serebii.net/itemdex/sprites/pgl/pokeball.png"
-        }
+    "特獎": f"{GITHUB_BASE_URL}beast-ball.png",
+    "一獎": f"{GITHUB_BASE_URL}luxury-ball.png",
+    "二獎": f"{GITHUB_BASE_URL}master-ball.png",
+    "三獎": f"{GITHUB_BASE_URL}ultra-ball.png",
+    "四獎": f"{GITHUB_BASE_URL}great-ball.png",
+    "五獎": f"{GITHUB_BASE_URL}poke-ball.png"
+}
 
 @st.cache_data(ttl=300) 
 def get_admin(): 
